@@ -1,0 +1,153 @@
+<article class="product-card group relative" data-product-id="{{ product.id }}">
+
+  <!-- Image wrapper — square, no gaps -->
+  <div class="relative bg-[#EDE8E2] aspect-square overflow-hidden">
+
+    <!-- Images track -->
+    <div class="product-images-track w-full h-full flex transition-transform duration-500 ease-in-out"
+         id="track-{{ product.id }}"
+         style="width: 100%; display: flex;">
+
+      {% with variants=product.product_variants.all %}
+        {% if variants %}
+          {% for variant in variants %}
+            {% for img in variant.images.all %}
+            <div class="flex-shrink-0 w-full h-full"
+                 style="min-width:100%;"
+                 data-color="{{ variant.color.name|lower }}">
+              <img src="{{ img.image.url }}" alt="{{ product.name }}"
+                   class="w-full h-full object-cover object-center block" />
+            </div>
+            {% empty %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+
+        {% if not variants or not variants.0.images.exists %}
+          {% if product.main_image %}
+          <div class="flex-shrink-0 w-full h-full" style="min-width:100%;">
+            <img src="{{ product.main_image.url }}" alt="{{ product.name }}"
+                 class="w-full h-full object-cover object-center block" />
+          </div>
+          {% else %}
+          <div class="flex-shrink-0 w-full h-full flex items-center justify-center" style="min-width:100%;">
+            <span class="text-warm-light/40 font-display text-2xl italic">Amico</span>
+          </div>
+          {% endif %}
+        {% endif %}
+      {% endwith %}
+
+    </div>
+
+    <!-- Arrows (show on hover, only if multiple images) -->
+    <button
+      class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+      onclick="cardSlide('{{ product.id }}', -1, event)"
+      aria-label="Предыдущее фото"
+    >
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <path d="M6.5 2L3.5 5l3 3" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button
+      class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+      onclick="cardSlide('{{ product.id }}', 1, event)"
+      aria-label="Следующее фото"
+    >
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <path d="M3.5 2l3 3-3 3" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Dots indicator -->
+    <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+         id="dots-{{ product.id }}">
+      {% with variants=product.product_variants.all %}
+        {% if variants %}
+          {% for variant in variants %}
+            {% for img in variant.images.all %}
+            <span class="w-1.5 h-1.5 rounded-full {% if forloop.parentloop.first and forloop.first %}bg-white{% else %}bg-white/50{% endif %} transition-all duration-200"></span>
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+  </div>
+
+  <!-- White info container - centered -->
+  <div class="bg-white px-4 pt-3 pb-4 text-center">
+
+    <a
+      href="/product/{{ product.slug }}"
+      hx-get="/product/{{ product.slug }}"
+      hx-target="#main-content"
+      hx-push-url="true"
+    >
+      <h3 class="font-body text-sm text-warm-dark hover:text-accent transition-colors duration-200 leading-snug mb-2">
+        {{ product.name }}
+      </h3>
+    </a>
+
+    <!-- Color swatches -->
+    {% with variants=product.product_variants.all %}
+    {% if variants %}
+    <div class="flex items-center justify-center gap-2 mb-2">
+      {% for variant in variants %}
+      <button
+        class="card-color-dot w-4 h-4 rounded-full transition-all duration-200"
+        style="background-color: {{ variant.color.hex_code }}; box-shadow: {% if current_color and variant.color.name|lower == current_color|lower %}0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814{% elif forloop.first and not current_color %}0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814{% else %}0 0 0 2px transparent{% endif %};"
+        title="{{ variant.color.name }}"
+        data-product="{{ product.id }}"
+        onclick="cardSwitchColor('{{ product.id }}', '{{ variant.color.name|lower }}', this)"
+      ></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <p class="font-body text-sm font-medium text-warm-dark mb-3">{{ product.price }} ₽</p>
+
+    <a
+      href="/product/{{ product.slug }}"
+      hx-get="/product/{{ product.slug }}"
+      hx-target="#main-content"
+      hx-push-url="true"
+      class="block w-full bg-white border border-warm-light/60 text-warm-dark text-xs tracking-widest uppercase font-body py-2.5 hover:bg-warm-dark hover:text-cream hover:border-warm-dark transition-all duration-250"
+    >
+      Подробнее
+    </a>
+
+  </div>
+
+  <script>
+    (function() {
+      const activeColor = '{{ current_color|lower }}';
+      if (activeColor) {
+        const track = document.getElementById('track-{{ product.id }}');
+        if (track) {
+          const slides = Array.from(track.children);
+          const targetIdx = slides.findIndex(s => (s.dataset.color || '') === activeColor);
+          if (targetIdx !== -1) {
+            window._cardState = window._cardState || {};
+            window._cardState['{{ product.id }}'] = { idx: targetIdx };
+            
+            // Set initial inline styles synchronously to avoid visual glitch
+            track.style.transition = 'none'; // Temporarily disable transition
+            track.style.transform = `translateX(-${targetIdx * 100}%)`;
+            
+            // Re-enable transition after a brief moment
+            setTimeout(() => { track.style.transition = ''; }, 50);
+
+            const dots = document.querySelectorAll('#dots-{{ product.id }} span');
+            dots.forEach((d, i) => {
+              d.classList.toggle('bg-white', i === targetIdx);
+              d.classList.toggle('bg-white/50', i !== targetIdx);
+            });
+          }
+        }
+      }
+    })();
+  </script>
+
+</article>

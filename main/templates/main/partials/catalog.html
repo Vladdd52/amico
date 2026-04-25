@@ -1,0 +1,319 @@
+<!-- ═══════════════════ FILTER SIDEBAR OVERLAY ═══════════════════ -->
+<div id="filter-overlay"
+     class="fixed inset-0 z-40 bg-warm-dark/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+     onclick="closeFilter()"></div>
+
+<aside id="filter-sidebar"
+       class="fixed top-0 right-0 bottom-0 z-50 w-80 bg-cream shadow-2xl overflow-y-auto"
+       style="transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);">
+
+  <div class="p-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="font-display text-2xl font-light">Фильтры</h2>
+      <button onclick="closeFilter()" class="text-warm-mid hover:text-warm-dark transition-colors">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="filter-form">
+
+      <!-- ── SORT ── -->
+      <div class="mb-8">
+        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-4">Сортировка</h3>
+        <div class="space-y-1">
+          {% for label, value in sort_options %}
+          <label class="flex items-center gap-3 cursor-pointer group py-1.5">
+            <input type="radio" name="sort" value="{{ value }}"
+                   {% if current_sort == value %}checked{% endif %}
+                   class="hidden peer sort-radio"
+                   onchange="applyFilters()" />
+            <span class="sort-radio-ui w-4 h-4 rounded-full border border-warm-light/60 flex items-center justify-center flex-shrink-0 transition-all duration-200 peer-checked:border-warm-dark after:content-[''] after:w-2 after:h-2 after:bg-warm-dark after:rounded-full after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200"></span>
+            <span class="text-sm font-body text-warm-mid group-hover:text-warm-dark transition-colors">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="border-t border-warm-light/30 mb-8"></div>
+
+      <!-- ── COLOR ── -->
+      <div class="mb-8">
+        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-4">Цвет</h3>
+        <div class="flex flex-wrap gap-3">
+          {% for color in colors %}
+          <button
+            type="button"
+            class="filter-color-btn flex flex-col items-center gap-1.5 cursor-pointer group"
+            data-color="{{ color.name }}"
+            onclick="toggleColorFilter('{{ color.name }}', this)"
+          >
+            <span
+              class="filter-color-swatch w-7 h-7 rounded-full block transition-all duration-150"
+              style="background-color: {{ color.hex_code }}; box-shadow: 0 0 0 2px transparent;"
+            ></span>
+            <span class="text-xs text-warm-light font-body group-hover:text-warm-dark transition-colors leading-none">{{ color.name }}</span>
+          </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" name="color" id="color-filter-value" value="" />
+      </div>
+
+      <div class="border-t border-warm-light/30 mb-8"></div>
+
+      <!-- ── PRICE ── -->
+      <div class="mb-8">
+        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-5">Цена</h3>
+
+        <!-- Price inputs -->
+        <div class="flex gap-3 mb-4">
+          <div class="flex-1">
+            <label class="text-xs text-warm-light font-body block mb-1">От</label>
+            <input type="number" name="min_price" id="min_price_input"
+                   value="{{ current_min_price|default:'' }}"
+                   placeholder="0"
+                   class="w-full bg-transparent border-b border-warm-light/50 text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
+                   oninput="syncSlider('min'); applyFilters()" />
+          </div>
+          <div class="flex-1">
+            <label class="text-xs text-warm-light font-body block mb-1">До</label>
+            <input type="number" name="max_price" id="max_price_input"
+                   value="{{ current_max_price|default:'' }}"
+                   placeholder="100000"
+                   class="w-full bg-transparent border-b border-warm-light/50 text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
+                   oninput="syncSlider('max'); applyFilters()" />
+          </div>
+        </div>
+
+        <!-- Range sliders -->
+        <div class="relative pt-1">
+          <input type="range" id="min_price_slider"
+                 min="0" max="500000" step="500"
+                 value="{{ current_min_price|default:0 }}"
+                 class="w-full mb-3"
+                 oninput="syncInput('min', this.value); applyFilters()" />
+          <input type="range" id="max_price_slider"
+                 min="0" max="500000" step="500"
+                 value="{{ current_max_price|default:500000 }}"
+                 class="w-full"
+                 oninput="syncInput('max', this.value); applyFilters()" />
+        </div>
+      </div>
+
+      <div class="border-t border-warm-light/30 mb-8"></div>
+
+      <!-- Reset -->
+      <button type="button" onclick="resetFilters()"
+              class="w-full border border-warm-light text-warm-mid text-xs tracking-widest uppercase font-body py-3 hover:border-warm-dark hover:text-warm-dark transition-colors duration-200">
+        Сбросить всё
+      </button>
+
+    </form>
+  </div>
+</aside>
+
+<!-- ═══════════════════ CATALOG MAIN ═══════════════════ -->
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+  <!-- Header row -->
+  <div class="flex items-end justify-between mb-8">
+    <div>
+      <p class="text-xs tracking-widest uppercase text-warm-light font-body mb-1">
+        {% if current_category %}{{ current_category.name }}{% else %}Каталог{% endif %}
+      </p>
+      <h1 class="font-display text-3xl font-light">
+        {% if current_category %}{{ current_category.name }}{% else %}Все товары{% endif %}
+      </h1>
+    </div>
+
+    <button onclick="openFilter()"
+            class="flex items-center gap-2.5 text-xs tracking-widest uppercase font-body text-warm-mid hover:text-warm-dark border-b border-transparent hover:border-warm-mid pb-0.5 transition-all duration-200">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <line x1="0" y1="1" x2="16" y2="1" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="3" y1="6" x2="13" y2="6" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6" y1="11" x2="10" y2="11" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Фильтры {% if active_filter_count %}<span class="bg-warm-dark text-cream rounded-full w-4 h-4 flex items-center justify-center text-[10px]">{{ active_filter_count }}</span>{% endif %}
+    </button>
+  </div>
+
+  <!-- Active filters chips -->
+  {% if search_query or current_color or current_min_price or current_max_price or current_sort %}
+  <div class="flex flex-wrap gap-2 mb-6">
+    {% if current_color %}
+    <span class="flex items-center gap-1.5 text-xs font-body text-warm-dark bg-white border border-warm-light/50 px-3 py-1.5 rounded-full">
+      {{ current_color }}
+      <button onclick="clearColorFilter()" class="text-warm-light hover:text-warm-dark ml-1">×</button>
+    </span>
+    {% endif %}
+    {% if current_sort %}
+    <span class="flex items-center gap-1.5 text-xs font-body text-warm-dark bg-white border border-warm-light/50 px-3 py-1.5 rounded-full">
+      {% for label, value in sort_options %}{% if value == current_sort %}{{ label }}{% endif %}{% endfor %}
+    </span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Products grid -->
+  <div id="catalog-grid">
+    {% include 'main/partials/catalog_grid.html' %}
+  </div>
+
+</div>
+
+<script>
+function openFilter() {
+  document.getElementById('filter-sidebar').style.transform = 'translateX(0)';
+  document.getElementById('filter-overlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+function closeFilter() {
+  document.getElementById('filter-sidebar').style.transform = 'translateX(100%)';
+  document.getElementById('filter-overlay').classList.add('opacity-0', 'pointer-events-none');
+}
+
+// ── Color filter toggle (active state) ──
+var _activeColor = '{{ current_color|default:"" }}';
+
+function toggleColorFilter(colorName, btn) {
+  const swatch = btn.querySelector('.filter-color-swatch');
+  const input = document.getElementById('color-filter-value');
+
+  if (_activeColor === colorName) {
+    // Deselect
+    _activeColor = '';
+    swatch.style.boxShadow = '0 0 0 2px transparent';
+    input.value = '';
+  } else {
+    // Deselect all
+    document.querySelectorAll('.filter-color-btn .filter-color-swatch').forEach(s => {
+      s.style.boxShadow = '0 0 0 2px transparent';
+    });
+    _activeColor = colorName;
+    swatch.style.boxShadow = '0 0 0 2.5px #F5F0EB, 0 0 0 4px #1C1814';
+    input.value = colorName;
+  }
+  applyFilters();
+}
+
+function clearColorFilter() {
+  _activeColor = '';
+  document.getElementById('color-filter-value').value = '';
+  document.querySelectorAll('.filter-color-btn .filter-color-swatch').forEach(s => {
+    s.style.boxShadow = '0 0 0 2px transparent';
+  });
+  applyFilters();
+}
+
+// Restore active color swatch on load
+(function() {
+  if (_activeColor) {
+    const btn = document.querySelector(`.filter-color-btn[data-color="${_activeColor}"]`);
+    if (btn) {
+      btn.querySelector('.filter-color-swatch').style.boxShadow = '0 0 0 2.5px #F5F0EB, 0 0 0 4px #1C1814';
+    }
+  }
+})();
+
+// ── Sort radio custom UI ──
+// (Removed JS: now handled by Tailwind peer classes)
+
+// ── Price sync ──
+function syncSlider(type, val) {
+  if (type === 'min') document.getElementById('min_price_slider').value = val || 0;
+  if (type === 'max') document.getElementById('max_price_slider').value = val || 500000;
+}
+function syncInput(type, val) {
+  if (type === 'min') document.getElementById('min_price_input').value = val;
+  if (type === 'max') document.getElementById('max_price_input').value = val;
+}
+
+// ── Apply filters via HTMX ──
+var _filterTimer = null;
+function applyFilters() {
+  clearTimeout(_filterTimer);
+  _filterTimer = setTimeout(() => {
+    const form = document.getElementById('filter-form');
+    const params = new URLSearchParams();
+
+    // Sort
+    const sort = form.querySelector('.sort-radio:checked');
+    if (sort && sort.value) params.append('sort', sort.value);
+
+    // Color
+    const color = document.getElementById('color-filter-value').value;
+    if (color) params.append('color', color);
+
+    // Price
+    const minPrice = document.getElementById('min_price_input').value;
+    const maxPrice = document.getElementById('max_price_input').value;
+    if (minPrice) params.append('min_price', minPrice);
+    if (maxPrice && maxPrice < 500000) params.append('max_price', maxPrice);
+
+    // Search
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && searchInput.value) params.append('q', searchInput.value);
+
+    const path = window.location.pathname;
+    const url = path + (params.toString() ? '?' + params.toString() : '');
+
+    htmx.ajax('GET', url, { target: '#catalog-grid', swap: 'innerHTML' });
+  }, 300);
+}
+
+function resetFilters() {
+  document.getElementById('filter-form').reset();
+  document.getElementById('color-filter-value').value = '';
+  _activeColor = '';
+  document.querySelectorAll('.filter-color-btn .filter-color-swatch').forEach(s => {
+    s.style.boxShadow = '0 0 0 2px transparent';
+  });
+  document.getElementById('min_price_input').value = '';
+  document.getElementById('max_price_input').value = '';
+  document.getElementById('min_price_slider').value = 0;
+  document.getElementById('max_price_slider').value = 500000;
+
+  htmx.ajax('GET', window.location.pathname, { target: '#catalog-grid', swap: 'innerHTML' });
+}
+
+// ── Card slide & color (global, also covers catalog page cards) ──
+window._cardState = window._cardState || {};
+
+window.cardSlide = function(productId, dir, event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const total = track.children.length;
+  if (total <= 1) return;
+  const state = window._cardState[productId] || { idx: 0 };
+  state.idx = (state.idx + dir + total) % total;
+  window._cardState[productId] = state;
+  track.style.transform = `translateX(-${state.idx * 100}%)`;
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === state.idx);
+    d.classList.toggle('bg-white/50', i !== state.idx);
+  });
+};
+
+window.cardSwitchColor = function(productId, colorName, btn) {
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const slides = Array.from(track.children);
+  const targetIdx = slides.findIndex(s => (s.dataset.color || '') === colorName);
+  if (targetIdx === -1) return;
+  window._cardState[productId] = { idx: targetIdx };
+  track.style.transform = `translateX(-${targetIdx * 100}%)`;
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === targetIdx);
+    d.classList.toggle('bg-white/50', i !== targetIdx);
+  });
+  const card = btn.closest('article');
+  card.querySelectorAll('.card-color-dot').forEach(d => {
+    d.style.boxShadow = '0 0 0 2px transparent';
+  });
+  btn.style.boxShadow = '0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814';
+};
+</script>

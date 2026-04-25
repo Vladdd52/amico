@@ -1,0 +1,17 @@
+{% if image %}
+<img
+  src="{{ image.image.url }}"
+  alt="{{ product.name }}"
+  class="product-card-img w-full h-full object-cover"
+/>
+{% elif product.main_image %}
+<img
+  src="{{ product.main_image.url }}"
+  alt="{{ product.name }}"
+  class="product-card-img w-full h-full object-cover"
+/>
+{% else %}
+<div class="w-full h-full flex items-center justify-center">
+  <span class="text-warm-light/40 font-display text-2xl italic">Amico</span>
+</div>
+{% endif %}

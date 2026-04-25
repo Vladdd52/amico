@@ -1,0 +1,226 @@
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+  <!-- Breadcrumb -->
+  <nav class="mb-8 flex items-center gap-2 text-xs text-warm-light font-body tracking-wider">
+    <a href="/" hx-get="/" hx-target="#main-content" hx-push-url="true"
+      class="hover:text-warm-dark transition-colors">Главная</a>
+    <span>/</span>
+    <a href="/catalog/" hx-get="/catalog/" hx-target="#main-content" hx-push-url="true"
+      class="hover:text-warm-dark transition-colors">Каталог</a>
+    {% if object.category %}
+    <span>/</span>
+    <a href="/catalog/{{ object.category.slug }}/" hx-get="/catalog/{{ object.category.slug }}/"
+      hx-target="#main-content" hx-push-url="true"
+      class="hover:text-warm-dark transition-colors">{{object.category.name}}</a>
+    {% endif %}
+    <span>/</span>
+    <span class="text-warm-dark">{{ object.name }}</span>
+  </nav>
+
+  <!-- ─── PRODUCT LAYOUT ─── -->
+  <div class="flex flex-col lg:flex-row gap-10 lg:gap-16">
+
+    <!-- ── LEFT: Gallery ── -->
+    <div class="lg:w-[55%] flex flex-col-reverse lg:flex-row gap-3">
+
+      <!-- Thumbnails (vertical on desktop, horizontal on mobile) -->
+      <div id="gallery-thumbs"
+        class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[560px] lg:w-20 flex-shrink-0">
+        {% for img in product_images %}
+        <button
+          class="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 overflow-hidden border-2 {% if forloop.first %}border-warm-dark{% else %}border-transparent{% endif %} hover:border-warm-mid transition-all duration-200"
+          onclick="setMainImage('{{ img.image.url }}', this)">
+          <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover" />
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- Main image -->
+      <div class="flex-1 bg-[#EDE8E2] aspect-[3/4] lg:aspect-auto overflow-hidden relative" id="gallery-main-wrap">
+        <div id="gallery-main" class="w-full h-full" style="min-height: 420px;">
+          {% if product_images %}
+          <img id="main-product-img" src="{{ product_images.0.image.url }}" alt="{{ object.name }}"
+            class="w-full h-full object-cover transition-opacity duration-300" />
+          {% elif object.main_image %}
+          <img id="main-product-img" src="{{ object.main_image.url }}" alt="{{ object.name }}"
+            class="w-full h-full object-cover" />
+          {% else %}
+          <div class="w-full h-full flex items-center justify-center">
+            <span class="font-display text-warm-light/40 text-4xl italic">Amico</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Product info ── -->
+    <div class="lg:w-[45%] lg:pt-4 flex flex-col">
+
+      <!-- Category tag -->
+      {% if object.category %}
+      <span class="text-xs tracking-widest uppercase text-warm-light font-body mb-3">{{ object.category.name }}</span>
+      {% endif %}
+
+      <!-- Name & price -->
+      <h1 class="font-display text-3xl lg:text-4xl font-light leading-tight mb-2">{{ object.name }}</h1>
+      <p class="font-body text-xl text-warm-dark mb-6">{{ object.price }} ₽</p>
+
+      <!-- Divider -->
+      <div class="border-t border-warm-light/40 mb-6"></div>
+
+      <!-- Color selection -->
+      {% if variants %}
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs tracking-widest uppercase text-warm-mid font-body">Цвет</span>
+          <span id="selected-color-name" class="text-xs text-warm-dark font-body">
+            {{ selected_variant.color.name|default:'' }}
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          {% for variant in variants %}
+          <button class="color-dot w-6 h-6 {% if variant == selected_variant %}active{% endif %}"
+            style="background-color: {{ variant.color.hex_code }};" title="{{ variant.color.name }}"
+            hx-get="/product/{{ object.slug }}?color={{ variant.color.name }}" hx-target="#gallery-content"
+            hx-trigger="click" onclick="setColorName('{{ variant.color.name }}', this)"></button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Stock info -->
+      <div id="product-stock" class="mb-6">
+        {% if selected_variant %}
+        {% if selected_variant.stock > 0 %}
+        <span class="text-xs text-green-700 font-body tracking-wider">● В наличии ({{ selected_variant.stock }}
+          шт.)</span>
+        {% else %}
+        <span class="text-xs text-red-500 font-body tracking-wider">● Нет в наличии</span>
+        {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- Add to cart -->
+      <div class="flex gap-3 mb-8">
+        <button
+          class="flex-1 bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300">
+          Добавить в корзину
+        </button>
+        <button
+          class="w-12 border border-warm-light hover:border-warm-dark flex items-center justify-center transition-colors duration-200 group">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 14s-6-4.3-6-8a4 4 0 0 1 6-3.4A4 4 0 0 1 14 6c0 3.7-6 8-6 8z" stroke="#C4B5A5" stroke-width="1.3"
+              class="group-hover:stroke-warm-dark transition-colors" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Description -->
+      {% if object.description %}
+      <div class="mb-8">
+        <button class="flex items-center justify-between w-full py-3 border-t border-warm-light/40 text-left group"
+          onclick="toggleAccordion(this)">
+          <span
+            class="text-xs tracking-widest uppercase text-warm-mid font-body group-hover:text-warm-dark transition-colors">Описание</span>
+          <svg class="accordion-icon transition-transform duration-200" width="12" height="12" viewBox="0 0 12 12"
+            fill="none">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div class="accordion-content overflow-hidden max-h-0 transition-all duration-300">
+          <p class="font-body text-sm text-warm-mid leading-relaxed pb-4 pt-2">{{ object.description }}</p>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Delivery accordion -->
+      <div>
+        <button class="flex items-center justify-between w-full py-3 border-t border-warm-light/40 text-left group"
+          onclick="toggleAccordion(this)">
+          <span
+            class="text-xs tracking-widest uppercase text-warm-mid font-body group-hover:text-warm-dark transition-colors">Доставка
+            и возврат</span>
+          <svg class="accordion-icon transition-transform duration-200" width="12" height="12" viewBox="0 0 12 12"
+            fill="none">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div class="accordion-content overflow-hidden max-h-0 transition-all duration-300">
+          <div class="font-body text-sm text-warm-mid leading-relaxed pb-4 pt-2 space-y-2">
+            <p>Доставка по всей России от 2 до 5 рабочих дней.</p>
+            <p>Бесплатный возврат в течение 14 дней.</p>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-warm-light/40"></div>
+
+    </div>
+  </div>
+
+  <!-- ─── RELATED PRODUCTS ─── -->
+  {% if related_products %}
+  <div class="mt-20">
+    <div class="mb-8">
+      <p class="text-xs tracking-widest uppercase text-warm-light font-body mb-1">Похожие товары</p>
+      <h2 class="font-display text-2xl font-light">Вам может понравиться</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
+      {% for product in related_products %}
+      {% include 'main/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- HTMX gallery swap target (hidden, updates gallery via partial) -->
+<div id="gallery-content" class="hidden"></div>
+
+<script>
+  function setMainImage(url, thumbBtn) {
+    const img = document.getElementById('main-product-img');
+    if (img) {
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = url;
+        img.style.opacity = '1';
+      }, 150);
+    }
+    // Update active thumb
+    document.querySelectorAll('#gallery-thumbs button').forEach(b => {
+      b.classList.remove('border-warm-dark');
+      b.classList.add('border-transparent');
+    });
+    thumbBtn.classList.add('border-warm-dark');
+    thumbBtn.classList.remove('border-transparent');
+  }
+
+  function setColorName(name, btn) {
+    document.getElementById('selected-color-name').textContent = name;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function toggleAccordion(btn) {
+    const content = btn.nextElementSibling;
+    const icon = btn.querySelector('.accordion-icon');
+    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+    if (isOpen) {
+      content.style.maxHeight = '0px';
+      icon.style.transform = 'rotate(0deg)';
+    } else {
+      content.style.maxHeight = content.scrollHeight + 'px';
+      icon.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  // When HTMX loads a new color variant, update the gallery
+  document.body.addEventListener('htmx:afterSwap', function (e) {
+    if (e.detail.target.id === 'gallery-content') {
+      const data = e.detail.target.dataset;
+      // Gallery partial will update the main gallery area via OOB swap
+    }
+  });
+</script>

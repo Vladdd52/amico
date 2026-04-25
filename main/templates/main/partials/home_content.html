@@ -1,0 +1,199 @@
+<!-- ═══════════════════ COMPACT BANNER CAROUSEL ═══════════════════ -->
+{% if banners %}
+<section class="max-w-6xl mx-auto px-6 pt-8 pb-6">
+  <div class="relative" style="height: 340px;">
+
+    <!-- Track with 3-card peek style -->
+    <div class="relative h-full overflow-hidden rounded-none">
+
+      <!-- Slides -->
+      <div id="carousel-track"
+           class="flex h-full transition-transform duration-500 ease-in-out"
+           style="will-change: transform;">
+        {% for banner in banners %}
+        <div class="flex-shrink-0 h-full relative" style="min-width: 100%;">
+          {% if banner.image %}
+          <img
+            src="{{ banner.image.url }}"
+            alt="{{ banner.title }}"
+            class="w-full h-full object-cover"
+          />
+          {% else %}
+          <div class="w-full h-full bg-warm-light/30 flex items-center justify-center">
+            <span class="font-display text-4xl text-warm-mid italic">Amico</span>
+          </div>
+          {% endif %}
+          {% if banner.title %}
+          <div class="absolute inset-0 bg-gradient-to-r from-warm-dark/60 via-warm-dark/20 to-transparent flex items-center">
+            <div class="pl-10 md:pl-14">
+              <p class="text-xs tracking-widest uppercase text-cream/70 font-body mb-2">Коллекция</p>
+              <h2 class="font-display text-cream text-4xl md:text-5xl font-light italic leading-tight max-w-xs">
+                {{ banner.title }}
+              </h2>
+              <a href="/catalog/"
+                 hx-get="/catalog/"
+                 hx-target="#main-content"
+                 hx-push-url="true"
+                 class="inline-block mt-5 text-xs tracking-widest uppercase text-cream border-b border-cream/50 hover:border-cream pb-0.5 font-body transition-colors duration-200">
+                Смотреть
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Prev -->
+      <button
+        onclick="carouselMove(-1)"
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow transition-all duration-200 z-10"
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M7.5 2.5L4.5 6l3 3.5" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Next -->
+      <button
+        onclick="carouselMove(1)"
+        class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow transition-all duration-200 z-10"
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4.5 2.5l3 3.5-3 3.5" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Dots -->
+      {% if banners|length > 1 %}
+      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" id="carousel-dots">
+        {% for banner in banners %}
+        <button
+          onclick="carouselGoto({{ forloop.counter0 }})"
+          class="carousel-dot w-1.5 h-1.5 rounded-full transition-all duration-300 {% if forloop.first %}bg-white w-4{% else %}bg-white/40{% endif %}"
+        ></button>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══════════════════ SECTION HEADER ═══════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mt-10 mb-6 flex items-end justify-between">
+  <div>
+    <p class="text-xs tracking-widest uppercase text-warm-light font-body mb-1">Коллекция</p>
+    <h2 class="font-display text-3xl font-light">Новые поступления</h2>
+  </div>
+  <a
+    href="/catalog/"
+    hx-get="/catalog/"
+    hx-target="#main-content"
+    hx-push-url="true"
+    class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-warm-mid/40 hover:border-warm-dark pb-0.5 transition-all duration-200 font-body"
+  >Смотреть все</a>
+</section>
+
+<!-- ═══════════════════ PRODUCTS GRID ═══════════════════ -->
+<section class="max-w-6xl mx-auto px-6 pb-16">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
+    {% for product in products %}
+    {% include 'main/partials/product_card.html' with product=product %}
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+// ── Carousel ──
+let carouselIndex = 0;
+const totalSlides = {{ banners|length|default:0 }};
+
+function carouselMove(dir) {
+  if (totalSlides <= 1) return;
+  carouselIndex = (carouselIndex + dir + totalSlides) % totalSlides;
+  carouselApply();
+}
+function carouselGoto(i) {
+  carouselIndex = i;
+  carouselApply();
+}
+function carouselApply() {
+  const track = document.getElementById('carousel-track');
+  if (!track) return;
+  track.style.transform = `translateX(-${carouselIndex * 100}%)`;
+
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+    if (i === carouselIndex) {
+      d.classList.add('bg-white', 'w-4');
+      d.classList.remove('bg-white/40', 'w-1.5');
+    } else {
+      d.classList.remove('bg-white', 'w-4');
+      d.classList.add('bg-white/40', 'w-1.5');
+    }
+  });
+}
+
+// Auto-advance
+let _carTimer = setInterval(() => carouselMove(1), 4500);
+const carSection = document.getElementById('carousel-track')?.closest('section');
+if (carSection) {
+  carSection.addEventListener('mouseenter', () => clearInterval(_carTimer));
+  carSection.addEventListener('mouseleave', () => {
+    _carTimer = setInterval(() => carouselMove(1), 4500);
+  });
+}
+
+// ── Card slide & color switch ──
+window._cardState = window._cardState || {};
+
+function cardSlide(productId, dir, event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const slides = Array.from(track.children);
+  const total = slides.length;
+  if (total <= 1) return;
+
+  const state = window._cardState[productId] || { idx: 0 };
+  state.idx = (state.idx + dir + total) % total;
+  window._cardState[productId] = state;
+  track.style.transform = `translateX(-${state.idx * 100}%)`;
+
+  // Update dots
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === state.idx);
+    d.classList.toggle('bg-white/50', i !== state.idx);
+  });
+}
+
+function cardSwitchColor(productId, colorName, btn) {
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const slides = Array.from(track.children);
+
+  // Find first slide with matching color
+  const targetIdx = slides.findIndex(s => (s.dataset.color || '') === colorName);
+  if (targetIdx === -1) return;
+
+  const state = { idx: targetIdx };
+  window._cardState[productId] = state;
+  track.style.transform = `translateX(-${targetIdx * 100}%)`;
+
+  // Update dot indicator
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === targetIdx);
+    d.classList.toggle('bg-white/50', i !== targetIdx);
+  });
+
+  // Active color dot - using box-shadow technique
+  const card = btn.closest('article');
+  card.querySelectorAll('.card-color-dot').forEach(d => {
+    d.style.boxShadow = '0 0 0 2px transparent';
+  });
+  btn.style.boxShadow = '0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814';
+}
+</script>
