@@ -143,6 +143,22 @@ class CatalogView(TemplateView):
         return TemplateResponse(request, self.template_name, context)
 
 
+# -------------------- SALE VIEW --------------------
+
+class SaleView(CatalogView):
+    def get_products(self, **kwargs):
+        products = super().get_products(**kwargs)
+        return products.filter(discount_price__isnull=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        class MockCategory:
+            name = "Скидки"
+            slug = "sale"
+        context['current_category'] = MockCategory()
+        return context
+
+
 # -------------------- PRODUCT DETAIL --------------------
 
 class ProductDetailView(DetailView):

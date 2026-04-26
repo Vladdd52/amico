@@ -10,7 +10,7 @@
   <div class="p-8">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
-      <h2 class="font-display text-2xl font-light">Фильтры</h2>
+      <h2 class="font-display text-xl sm:text-2xl font-light">Фильтры</h2>
       <button onclick="closeFilter()" class="text-warm-mid hover:text-warm-dark transition-colors">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -118,12 +118,10 @@
 <div class="max-w-6xl mx-auto px-6 py-10">
 
   <!-- Header row -->
-  <div class="flex items-end justify-between mb-8">
+  <div class="flex items-end justify-between mb-8 reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out">
     <div>
-      <p class="text-xs tracking-widest uppercase text-warm-light font-body mb-1">
-        {% if current_category %}{{ current_category.name }}{% else %}Каталог{% endif %}
-      </p>
-      <h1 class="font-display text-3xl font-light">
+      <p class="text-[10px] sm:text-xs tracking-widest uppercase text-warm-light font-body mb-1">Каталог</p>
+      <h1 class="font-display text-2xl sm:text-3xl font-light">
         {% if current_category %}{{ current_category.name }}{% else %}Все товары{% endif %}
       </h1>
     </div>
@@ -141,7 +139,7 @@
 
   <!-- Active filters chips -->
   {% if search_query or current_color or current_min_price or current_max_price or current_sort %}
-  <div class="flex flex-wrap gap-2 mb-6">
+  <div class="flex flex-wrap gap-2 mb-6 reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 delay-100 ease-out">
     {% if current_color %}
     <span class="flex items-center gap-1.5 text-xs font-body text-warm-dark bg-white border border-warm-light/50 px-3 py-1.5 rounded-full">
       {{ current_color }}
@@ -280,40 +278,35 @@ function resetFilters() {
 // ── Card slide & color (global, also covers catalog page cards) ──
 window._cardState = window._cardState || {};
 
-window.cardSlide = function(productId, dir, event) {
-  if (event) { event.preventDefault(); event.stopPropagation(); }
-  const track = document.getElementById('track-' + productId);
-  if (!track) return;
-  const total = track.children.length;
-  if (total <= 1) return;
-  const state = window._cardState[productId] || { idx: 0 };
-  state.idx = (state.idx + dir + total) % total;
-  window._cardState[productId] = state;
-  track.style.transform = `translateX(-${state.idx * 100}%)`;
-  const dots = document.querySelectorAll(`#dots-${productId} span`);
-  dots.forEach((d, i) => {
-    d.classList.toggle('bg-white', i === state.idx);
-    d.classList.toggle('bg-white/50', i !== state.idx);
-  });
-};
-
 window.cardSwitchColor = function(productId, colorName, btn) {
   const track = document.getElementById('track-' + productId);
   if (!track) return;
   const slides = Array.from(track.children);
   const targetIdx = slides.findIndex(s => (s.dataset.color || '') === colorName);
   if (targetIdx === -1) return;
+
   window._cardState[productId] = { idx: targetIdx };
-  track.style.transform = `translateX(-${targetIdx * 100}%)`;
-  const dots = document.querySelectorAll(`#dots-${productId} span`);
-  dots.forEach((d, i) => {
-    d.classList.toggle('bg-white', i === targetIdx);
-    d.classList.toggle('bg-white/50', i !== targetIdx);
-  });
+  track.scrollTo({ left: targetIdx * track.clientWidth, behavior: 'smooth' });
+
   const card = btn.closest('article');
   card.querySelectorAll('.card-color-dot').forEach(d => {
     d.style.boxShadow = '0 0 0 2px transparent';
   });
   btn.style.boxShadow = '0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814';
+};
+
+window.updateCardDots = function(productId) {
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const slideWidth = track.clientWidth;
+  if (slideWidth === 0) return;
+  const currentIdx = Math.round(track.scrollLeft / slideWidth);
+  
+  window._cardState[productId] = { idx: currentIdx };
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === currentIdx);
+    d.classList.toggle('bg-white/50', i !== currentIdx);
+  });
 };
 </script>

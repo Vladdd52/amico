@@ -162,6 +162,7 @@
         hx-get="/"
         hx-target="#main-content"
         hx-push-url="true"
+        hx-swap="innerHTML show:window:top"
         class="font-display text-2xl tracking-wider font-light text-warm-dark hover:text-accent transition-colors duration-300 absolute left-1/2 -translate-x-1/2"
       >
         Amico
@@ -210,14 +211,24 @@
           hx-get="/catalog/"
           hx-target="#main-content"
           hx-push-url="true"
+          hx-swap="innerHTML show:window:top"
           class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark transition-colors duration-200 font-body"
         >Все</a>
+        <a
+          href="/sale/"
+          hx-get="/sale/"
+          hx-target="#main-content"
+          hx-push-url="true"
+          hx-swap="innerHTML show:window:top"
+          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-warm-mid/40 hover:border-warm-dark pb-0.5 transition-colors duration-200 font-body"
+        >Скидки</a>
         {% for category in categories %}
         <a
           href="/catalog/{{ category.slug }}/"
           hx-get="/catalog/{{ category.slug }}/"
           hx-target="#main-content"
           hx-push-url="true"
+          hx-swap="innerHTML show:window:top"
           class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark transition-colors duration-200 font-body"
         >{{ category.name }}</a>
         {% endfor %}
@@ -231,10 +242,24 @@
   </div>
 
   <!-- ═══════════════════════════════════ FOOTER ═══════════════════════════════════ -->
-  <footer class="mt-24 border-t border-warm-light/40 py-10">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-      <span class="font-display text-xl text-warm-mid">Amico</span>
-      <p class="text-xs text-warm-light font-body tracking-wider">© 2025 Amico. Все права защищены.</p>
+  <footer class="mt-24 border-t border-warm-light/40 py-12">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+      
+      <!-- Brand & Copyright -->
+      <div class="flex flex-col items-center md:items-start gap-2">
+        <span class="font-display text-2xl text-warm-dark">Amico</span>
+        <p class="text-xs text-warm-light font-body tracking-wider">© 2025 Amico. Все права защищены.</p>
+      </div>
+
+      <!-- Contacts -->
+      <div class="flex flex-col items-center md:items-end gap-4">
+        <a href="tel:+998911368833" class="text-sm text-warm-mid hover:text-warm-dark transition-colors font-body tracking-wider">+998 91 136 88 33</a>
+        <div class="flex gap-6">
+          <a href="https://www.instagram.com/amico.uz/" target="_blank" class="text-[10px] sm:text-xs text-warm-mid hover:text-warm-dark transition-colors uppercase tracking-widest font-body">Instagram</a>
+          <a href="https://t.me/amicouzb" target="_blank" class="text-[10px] sm:text-xs text-warm-mid hover:text-warm-dark transition-colors uppercase tracking-widest font-body">Telegram</a>
+        </div>
+      </div>
+
     </div>
   </footer>
 
@@ -248,9 +273,10 @@
         </svg>
       </button>
       <span class="font-display text-3xl font-light mb-8">Amico</span>
-      <a href="/catalog/" hx-get="/catalog/" hx-target="#main-content" hx-push-url="true" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">Все товары</a>
+      <a href="/catalog/" hx-get="/catalog/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">Все товары</a>
+      <a href="/sale/" hx-get="/sale/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors"><span class="border-b border-warm-mid/40 pb-0.5">Скидки</span></a>
       {% for category in categories %}
-      <a href="/catalog/{{ category.slug }}/" hx-get="/catalog/{{ category.slug }}/" hx-target="#main-content" hx-push-url="true" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">{{ category.name }}</a>
+      <a href="/catalog/{{ category.slug }}/" hx-get="/catalog/{{ category.slug }}/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">{{ category.name }}</a>
       {% endfor %}
     </div>
   </div>
@@ -293,9 +319,33 @@
       }
     }
 
-    // HTMX: after content swap, re-init carousel if needed
+    // ── Scroll Reveal Animation ──
+    window.initScrollReveal = function() {
+      const elements = document.querySelectorAll('.reveal-on-scroll');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.remove('opacity-0', 'translate-y-6', 'translate-y-8');
+            entry.target.classList.add('opacity-100', 'translate-y-0');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.02, rootMargin: "50px" });
+      
+      elements.forEach(el => observer.observe(el));
+    };
+
+    // HTMX: after content swap
     document.body.addEventListener('htmx:afterSwap', function(e) {
       if (typeof initCarousel === 'function') initCarousel();
+      
+      // Re-init scroll reveal for new content
+      setTimeout(window.initScrollReveal, 100);
+    });
+
+    // Initial page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(window.initScrollReveal, 100);
     });
   </script>
 </body>

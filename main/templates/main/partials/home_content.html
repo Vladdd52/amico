@@ -1,131 +1,141 @@
-<!-- ═══════════════════ COMPACT BANNER CAROUSEL ═══════════════════ -->
-{% if banners %}
-<section class="max-w-6xl mx-auto px-6 pt-8 pb-6">
-  <div class="relative" style="height: 340px;">
+<!-- ═══════════════════ WELCOME SECTION ═══════════════════ -->
+<section class="max-w-3xl mx-auto px-4 pt-12 pb-8 text-center reveal-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ease-out">
+  <h1 class="font-display text-2xl sm:text-3xl lg:text-4xl text-warm-dark font-light leading-snug mb-5">
+    Добро пожаловать в наш мир,<br class="hidden sm:block"/> где стиль — это не роскошь, а привычка 💌
+  </h1>
+  <p class="font-body text-warm-mid text-sm sm:text-base leading-relaxed max-w-xl mx-auto mb-6">
+    Здесь собрана коллекция сумок, с которыми ты — и на встречу, и в отпуск, и на случай “просто почувствовать себя шикарно” 💆🏻‍♀️
+  </p>
+  
+  <div class="flex items-center justify-center gap-4 opacity-80 mt-6">
+    <div class="h-px bg-warm-light/60 flex-grow max-w-[60px]"></div>
+    <p class="font-display italic text-warm-dark text-lg sm:text-xl">
+      Спасибо, что зашли. Вы здесь не случайно
+    </p>
+    <div class="h-px bg-warm-light/60 flex-grow max-w-[60px]"></div>
+  </div>
+</section>
 
-    <!-- Track with 3-card peek style -->
-    <div class="relative h-full overflow-hidden rounded-none">
-
-      <!-- Slides -->
-      <div id="carousel-track"
-           class="flex h-full transition-transform duration-500 ease-in-out"
-           style="will-change: transform;">
-        {% for banner in banners %}
-        <div class="flex-shrink-0 h-full relative" style="min-width: 100%;">
-          {% if banner.image %}
-          <img
-            src="{{ banner.image.url }}"
-            alt="{{ banner.title }}"
-            class="w-full h-full object-cover"
-          />
-          {% else %}
-          <div class="w-full h-full bg-warm-light/30 flex items-center justify-center">
-            <span class="font-display text-4xl text-warm-mid italic">Amico</span>
-          </div>
-          {% endif %}
-          {% if banner.title %}
-          <div class="absolute inset-0 bg-gradient-to-r from-warm-dark/60 via-warm-dark/20 to-transparent flex items-center">
-            <div class="pl-10 md:pl-14">
-              <p class="text-xs tracking-widest uppercase text-cream/70 font-body mb-2">Коллекция</p>
-              <h2 class="font-display text-cream text-4xl md:text-5xl font-light italic leading-tight max-w-xs">
-                {{ banner.title }}
-              </h2>
-              <a href="/catalog/"
-                 hx-get="/catalog/"
-                 hx-target="#main-content"
-                 hx-push-url="true"
-                 class="inline-block mt-5 text-xs tracking-widest uppercase text-cream border-b border-cream/50 hover:border-cream pb-0.5 font-body transition-colors duration-200">
-                Смотреть
-              </a>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-        {% endfor %}
+<!-- ═══════════════════ FEATURES SECTION ═══════════════════ -->
+<section class="max-w-6xl mx-auto px-4 py-8 mb-4">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
+    
+    <!-- Feature 1 -->
+    <div class="text-center p-6 bg-white/40 rounded-lg reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 delay-100 ease-out">
+      <div class="w-12 h-12 mx-auto bg-warm-light/20 rounded-full flex items-center justify-center mb-4 text-accent">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path></svg>
       </div>
-
-      <!-- Prev -->
-      <button
-        onclick="carouselMove(-1)"
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow transition-all duration-200 z-10"
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M7.5 2.5L4.5 6l3 3.5" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <!-- Next -->
-      <button
-        onclick="carouselMove(1)"
-        class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow transition-all duration-200 z-10"
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 2.5l3 3.5-3 3.5" stroke="#1C1814" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <!-- Dots -->
-      {% if banners|length > 1 %}
-      <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" id="carousel-dots">
-        {% for banner in banners %}
-        <button
-          onclick="carouselGoto({{ forloop.counter0 }})"
-          class="carousel-dot w-1.5 h-1.5 rounded-full transition-all duration-300 {% if forloop.first %}bg-white w-4{% else %}bg-white/40{% endif %}"
-        ></button>
-        {% endfor %}
-      </div>
-      {% endif %}
-
+      <h3 class="font-display text-lg sm:text-xl mb-2">Все в наличии</h3>
+      <p class="font-body text-sm text-warm-mid">Вам не придется ждать — каждая сумка из каталога уже ждет отправки к вам.</p>
     </div>
+
+    <!-- Feature 2 -->
+    <div class="text-center p-6 bg-white/40 rounded-lg reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 delay-200 ease-out">
+      <div class="w-12 h-12 mx-auto bg-warm-light/20 rounded-full flex items-center justify-center mb-4 text-accent">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      </div>
+      <h3 class="font-display text-lg sm:text-xl mb-2">С заботой упаковано</h3>
+      <p class="font-body text-sm text-warm-mid">Мы уделяем внимание каждой детали, чтобы распаковка приносила вам радость.</p>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="text-center p-6 bg-white/40 rounded-lg reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 delay-300 ease-out">
+      <div class="w-12 h-12 mx-auto bg-warm-light/20 rounded-full flex items-center justify-center mb-4 text-accent">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <h3 class="font-display text-lg sm:text-xl mb-2">Под настроение</h3>
+      <p class="font-body text-sm text-warm-mid">Вам останется только выбрать ту, что идеально дополнит ваш сегодняшний образ.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ FULL-WIDTH SWIPEABLE BANNERS ═══════════════════ -->
+{% if banners %}
+<section class="w-full mt-4 mb-12 reveal-on-scroll opacity-0 translate-y-6 transition-all duration-1000 ease-out">
+  <div class="relative w-full h-[400px] md:h-[500px]">
+    
+    <!-- Swipeable Track -->
+    <div id="carousel-track" class="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide w-full scroll-smooth" onscroll="updateCarouselDots()">
+      {% for banner in banners %}
+      <div class="flex-shrink-0 h-full relative snap-center" style="min-width: 100%;">
+        {% if banner.image %}
+        <img src="{{ banner.image.url }}" alt="{{ banner.title }}" class="w-full h-full object-cover" />
+        {% else %}
+        <div class="w-full h-full bg-warm-light/30 flex items-center justify-center">
+          <span class="font-display text-4xl text-warm-mid italic">Amico</span>
+        </div>
+        {% endif %}
+        
+        {% if banner.title %}
+        <div class="absolute inset-0 bg-gradient-to-t from-warm-dark/80 via-warm-dark/20 to-transparent flex flex-col justify-end p-8 md:p-14">
+          <div class="max-w-6xl mx-auto w-full px-6">
+            <p class="text-xs tracking-widest uppercase text-cream/80 font-body mb-2">Коллекция</p>
+            <h2 class="font-display text-cream text-3xl md:text-5xl font-light italic leading-tight max-w-2xl">
+              {{ banner.title }}
+            </h2>
+            <a href="/catalog/" hx-get="/catalog/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" class="inline-block mt-5 text-xs tracking-widest uppercase text-cream border-b border-cream/50 hover:border-cream pb-0.5 font-body transition-colors duration-200 w-fit">
+              Смотреть
+            </a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Dots -->
+    {% if banners|length > 1 %}
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+      {% for banner in banners %}
+      <button onclick="carouselGoto({{ forloop.counter0 }})" class="carousel-dot w-1.5 h-1.5 rounded-full transition-all duration-300 {% if forloop.first %}bg-white w-4{% else %}bg-white/40{% endif %}"></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+
   </div>
 </section>
 {% endif %}
 
 <!-- ═══════════════════ SECTION HEADER ═══════════════════ -->
-<section class="max-w-6xl mx-auto px-6 mt-10 mb-6 flex items-end justify-between">
+<section class="max-w-6xl mx-auto px-6 mt-8 mb-6 flex items-end justify-between reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out">
   <div>
-    <p class="text-xs tracking-widest uppercase text-warm-light font-body mb-1">Коллекция</p>
-    <h2 class="font-display text-3xl font-light">Новые поступления</h2>
+    <p class="text-[10px] sm:text-xs tracking-widest uppercase text-warm-light font-body mb-1">Коллекция</p>
+    <h2 class="font-display text-2xl sm:text-3xl font-light">Новые поступления</h2>
   </div>
   <a
     href="/catalog/"
     hx-get="/catalog/"
     hx-target="#main-content"
     hx-push-url="true"
+    hx-swap="innerHTML show:window:top"
     class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-warm-mid/40 hover:border-warm-dark pb-0.5 transition-all duration-200 font-body"
   >Смотреть все</a>
 </section>
 
 <!-- ═══════════════════ PRODUCTS GRID ═══════════════════ -->
-<section class="max-w-6xl mx-auto px-6 pb-16">
+<section class="max-w-6xl mx-auto px-6 pb-20">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
     {% for product in products %}
-    {% include 'main/partials/product_card.html' with product=product %}
+    <div class="reveal-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out" style="transition-delay: {% cycle '0ms' '100ms' '200ms' '300ms' %};">
+      {% include 'main/partials/product_card.html' with product=product %}
+    </div>
     {% endfor %}
   </div>
 </section>
 
 <script>
 // ── Carousel ──
-let carouselIndex = 0;
 const totalSlides = {{ banners|length|default:0 }};
 
-function carouselMove(dir) {
-  if (totalSlides <= 1) return;
-  carouselIndex = (carouselIndex + dir + totalSlides) % totalSlides;
-  carouselApply();
-}
-function carouselGoto(i) {
-  carouselIndex = i;
-  carouselApply();
-}
-function carouselApply() {
+function updateCarouselDots() {
   const track = document.getElementById('carousel-track');
   if (!track) return;
-  track.style.transform = `translateX(-${carouselIndex * 100}%)`;
-
+  // Calculate active index based on scroll position
+  const index = Math.round(track.scrollLeft / track.clientWidth);
+  
   document.querySelectorAll('.carousel-dot').forEach((d, i) => {
-    if (i === carouselIndex) {
+    if (i === index) {
       d.classList.add('bg-white', 'w-4');
       d.classList.remove('bg-white/40', 'w-1.5');
     } else {
@@ -135,39 +145,37 @@ function carouselApply() {
   });
 }
 
+function carouselGoto(i) {
+  const track = document.getElementById('carousel-track');
+  if (!track) return;
+  track.scrollTo({ left: track.clientWidth * i, behavior: 'smooth' });
+}
+
 // Auto-advance
-let _carTimer = setInterval(() => carouselMove(1), 4500);
+let _carTimer = setInterval(() => {
+  const track = document.getElementById('carousel-track');
+  if (!track || totalSlides <= 1) return;
+  let nextIndex = Math.round(track.scrollLeft / track.clientWidth) + 1;
+  if (nextIndex >= totalSlides) nextIndex = 0;
+  carouselGoto(nextIndex);
+}, 4500);
+
 const carSection = document.getElementById('carousel-track')?.closest('section');
 if (carSection) {
   carSection.addEventListener('mouseenter', () => clearInterval(_carTimer));
   carSection.addEventListener('mouseleave', () => {
-    _carTimer = setInterval(() => carouselMove(1), 4500);
+    _carTimer = setInterval(() => {
+      const track = document.getElementById('carousel-track');
+      if (!track || totalSlides <= 1) return;
+      let nextIndex = Math.round(track.scrollLeft / track.clientWidth) + 1;
+      if (nextIndex >= totalSlides) nextIndex = 0;
+      carouselGoto(nextIndex);
+    }, 4500);
   });
 }
 
 // ── Card slide & color switch ──
 window._cardState = window._cardState || {};
-
-function cardSlide(productId, dir, event) {
-  if (event) { event.preventDefault(); event.stopPropagation(); }
-  const track = document.getElementById('track-' + productId);
-  if (!track) return;
-  const slides = Array.from(track.children);
-  const total = slides.length;
-  if (total <= 1) return;
-
-  const state = window._cardState[productId] || { idx: 0 };
-  state.idx = (state.idx + dir + total) % total;
-  window._cardState[productId] = state;
-  track.style.transform = `translateX(-${state.idx * 100}%)`;
-
-  // Update dots
-  const dots = document.querySelectorAll(`#dots-${productId} span`);
-  dots.forEach((d, i) => {
-    d.classList.toggle('bg-white', i === state.idx);
-    d.classList.toggle('bg-white/50', i !== state.idx);
-  });
-}
 
 function cardSwitchColor(productId, colorName, btn) {
   const track = document.getElementById('track-' + productId);
@@ -178,16 +186,8 @@ function cardSwitchColor(productId, colorName, btn) {
   const targetIdx = slides.findIndex(s => (s.dataset.color || '') === colorName);
   if (targetIdx === -1) return;
 
-  const state = { idx: targetIdx };
-  window._cardState[productId] = state;
-  track.style.transform = `translateX(-${targetIdx * 100}%)`;
-
-  // Update dot indicator
-  const dots = document.querySelectorAll(`#dots-${productId} span`);
-  dots.forEach((d, i) => {
-    d.classList.toggle('bg-white', i === targetIdx);
-    d.classList.toggle('bg-white/50', i !== targetIdx);
-  });
+  window._cardState[productId] = { idx: targetIdx };
+  track.scrollTo({ left: targetIdx * track.clientWidth, behavior: 'smooth' });
 
   // Active color dot - using box-shadow technique
   const card = btn.closest('article');
@@ -196,4 +196,21 @@ function cardSwitchColor(productId, colorName, btn) {
   });
   btn.style.boxShadow = '0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814';
 }
+
+window.updateCardDots = function(productId) {
+  const track = document.getElementById('track-' + productId);
+  if (!track) return;
+  const slideWidth = track.clientWidth;
+  if (slideWidth === 0) return;
+  const currentIdx = Math.round(track.scrollLeft / slideWidth);
+  
+  window._cardState[productId] = { idx: currentIdx };
+  const dots = document.querySelectorAll(`#dots-${productId} span`);
+  dots.forEach((d, i) => {
+    d.classList.toggle('bg-white', i === currentIdx);
+    d.classList.toggle('bg-white/50', i !== currentIdx);
+  });
+};
+
+
 </script>

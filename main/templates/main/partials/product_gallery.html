@@ -1,34 +1,35 @@
-<!-- OOB swap for gallery thumbnails -->
-<div id="gallery-thumbs" hx-swap-oob="true" class="flex flex-col gap-2 overflow-y-auto max-h-[560px] w-20 flex-shrink-0">
-  {% for img in product_images %}
-  <button
-    class="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 overflow-hidden border-2 {% if forloop.first %}border-warm-dark{% else %}border-transparent{% endif %} hover:border-warm-mid transition-all duration-200"
-    onclick="setMainImage('{{ img.image.url }}', this)"
-  >
-    <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover" />
-  </button>
-  {% endfor %}
+<div id="gallery-thumbs"
+    class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[560px] lg:w-20 flex-shrink-0">
+    {% for img in product_images %}
+    <button
+      class="gallery-thumb-btn flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 overflow-hidden border-2 {% if forloop.first %}border-warm-dark{% else %}border-transparent{% endif %} hover:border-warm-mid transition-all duration-200"
+      onclick="setMainImage({{ forloop.counter0 }}, this)">
+      <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover" />
+    </button>
+    {% endfor %}
 </div>
-
 <!-- OOB swap for main image -->
-<div id="gallery-main" class="w-full h-full" hx-swap-oob="true" style="min-height: 420px;">
+<div id="gallery-main" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth" hx-swap-oob="true" style="min-height: 420px;" onscroll="updateGalleryThumbs()">
   {% if product_images %}
-  <img
-    id="main-product-img"
-    src="{{ product_images.0.image.url }}"
-    alt="{{ object.name }}"
-    class="w-full h-full object-cover transition-opacity duration-300"
-    style="transition: opacity 0.3s ease;"
-  />
+    {% for img in product_images %}
+    <div class="flex-shrink-0 w-full h-full snap-center relative">
+      <img
+        src="{{ img.image.url }}"
+        alt="{{ object.name }}"
+        class="w-full h-full object-cover"
+      />
+    </div>
+    {% endfor %}
   {% elif object.main_image %}
-  <img
-    id="main-product-img"
-    src="{{ object.main_image.url }}"
-    alt="{{ object.name }}"
-    class="w-full h-full object-cover"
-  />
+    <div class="flex-shrink-0 w-full h-full snap-center relative">
+      <img
+        src="{{ object.main_image.url }}"
+        alt="{{ object.name }}"
+        class="w-full h-full object-cover"
+      />
+    </div>
   {% else %}
-  <div class="w-full h-full flex items-center justify-center">
+  <div class="flex-shrink-0 w-full h-full flex items-center justify-center snap-center relative">
     <span class="font-display text-warm-light/40 text-4xl italic">Amico</span>
   </div>
   {% endif %}
