@@ -31,7 +31,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'categories': Category.objects.all(),
             'banners': Banner.objects.filter(is_active=True).order_by('order'),
             'products': Product.objects.prefetch_related(
                 'product_variants__color',
@@ -118,7 +117,6 @@ class CatalogView(TemplateView):
         ])
 
         context.update({
-            'categories': Category.objects.all(),
             'colors': Color.objects.all(),
             'products': self.get_products(**kwargs),
             'current_category': current_category,
@@ -189,7 +187,6 @@ class ProductDetailView(DetailView):
         )
 
         context.update({
-            'categories': Category.objects.all(),
             'variants': variants,
             'selected_variant': selected_variant,
             'product_images': selected_variant.images.all() if selected_variant else [],

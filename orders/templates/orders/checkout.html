@@ -1,0 +1,83 @@
+{% extends 'main/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-6 py-12 min-h-[60vh] reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out">
+  <h1 class="font-display text-4xl mb-8 font-light">Оформление заказа</h1>
+  
+  <div class="flex flex-col lg:flex-row gap-12">
+    <!-- Form -->
+    <div class="flex-1">
+      <div class="bg-white p-8 border border-warm-light/30">
+        <h2 class="font-display text-2xl mb-6">Ваши данные</h2>
+        <form method="post" action="{% url 'orders:checkout' %}">
+          {% csrf_token %}
+          
+          <div class="mb-6">
+            <label class="block text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Имя</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <p class="text-red-500 text-xs mt-1">{{ form.name.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <div class="mb-10">
+            <label class="block text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Телефон</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+              <p class="text-red-500 text-xs mt-1">{{ form.phone.errors.0 }}</p>
+            {% endif %}
+          </div>
+          
+          <button type="submit" class="w-full bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300">
+            Оформить в Telegram
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Summary -->
+    <div class="lg:w-80 flex-shrink-0">
+      <div class="bg-[#EDE8E2] p-8 border border-warm-light/30 sticky top-24">
+        <h2 class="font-display text-2xl mb-6">Ваш заказ</h2>
+        
+        <div class="space-y-4 mb-6 border-b border-warm-light/30 pb-6">
+          {% for item in cart %}
+          <div class="flex justify-between text-sm">
+            <span class="text-warm-mid font-body pr-4">{{ item.variant.product.name }} ({{ item.variant.color.name }}) x{{ item.quantity }}</span>
+            <span class="font-medium font-body whitespace-nowrap">{{ item.total_price|floatformat:0|intcomma }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <span class="font-body text-warm-dark font-medium uppercase tracking-widest text-xs">Итого:</span>
+          <span class="font-body text-xl font-medium text-warm-dark">{{ cart.get_total_price|floatformat:0|intcomma }} сум</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base styles for Django form fields injected with class 'form-control' */
+  .form-control {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(107, 94, 82, 0.3); /* warm-mid/30 */
+    padding: 8px 0;
+    color: #1C1814;
+    font-family: 'Jost', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .form-control:focus {
+    border-bottom-color: #1C1814;
+  }
+  .form-control::placeholder {
+    color: rgba(196, 181, 165, 0.6);
+  }
+</style>
+{% endblock %}

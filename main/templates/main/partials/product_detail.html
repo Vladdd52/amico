@@ -114,10 +114,44 @@
 
       <!-- Add to cart -->
       <div class="flex gap-3 mb-8">
-        <button
-          class="flex-1 bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300">
-          Добавить в корзину
+        {% if selected_variant and selected_variant.stock > 0 %}
+        <form hx-post="{% url 'cart:cart_add' selected_variant.id %}"
+              hx-target="#cart-icon"
+              hx-swap="outerHTML"
+              class="flex-1 flex gap-3"
+              onsubmit="window.handleAddToCart(this, event);">
+          {% csrf_token %}
+          
+          <div class="flex items-stretch border border-warm-light hover:border-warm-dark transition-colors duration-200 w-32">
+             <button type="button" class="flex-1 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="window.updateQuantity(-1)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                   <path d="M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+             </button>
+             <input type="number" name="quantity" id="quantity-input" value="1" min="1" max="{{ selected_variant.stock }}" class="w-10 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;">
+             <button type="button" class="flex-1 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="window.updateQuantity(1)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                   <path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+             </button>
+          </div>
+
+          <button type="submit"
+            class="flex-1 bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300 transition-all">
+            Добавить в корзину
+          </button>
+        </form>
+        {% elif selected_variant %}
+        <button disabled
+          class="flex-1 bg-warm-light/50 text-cream text-xs tracking-widest uppercase font-body py-4 cursor-not-allowed">
+          Нет в наличии
         </button>
+        {% else %}
+        <button disabled
+          class="flex-1 bg-warm-light text-cream text-xs tracking-widest uppercase font-body py-4 cursor-not-allowed">
+          Выберите цвет
+        </button>
+        {% endif %}
         <button
           class="w-12 border border-warm-light hover:border-warm-dark flex items-center justify-center transition-colors duration-200 group">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -252,4 +286,42 @@
       // Gallery partial will update the main gallery area via OOB swap
     }
   });
+
+  window.updateQuantity = function(change) {
+    const input = document.getElementById('quantity-input');
+    if (!input) return;
+    let val = parseInt(input.value) || 1;
+    let max = parseInt(input.getAttribute('max'));
+    if (isNaN(max)) max = 9999;
+    val += change;
+    if (val < 1) val = 1;
+    if (val > max) val = max;
+    input.value = val;
+  };
+
+  window.handleAddToCart = function(form, event) {
+    const btn = form.querySelector('button[type=submit]');
+    if (btn.disabled) {
+      event.preventDefault();
+      return false;
+    }
+    
+    // Save original state
+    const origText = btn.innerHTML;
+    const origClasses = btn.className;
+    
+    // Set success state
+    btn.innerHTML = 'Добавлено ✓';
+    btn.className = "flex-1 bg-green-700 text-cream text-xs tracking-widest uppercase font-body py-4 transition-all duration-500 cursor-not-allowed";
+    
+    // Disable slightly after to allow HTMX to process the submit event properly
+    setTimeout(() => { btn.disabled = true; }, 10);
+    
+    // Restore after 3 seconds
+    setTimeout(() => {
+      btn.innerHTML = origText;
+      btn.className = origClasses;
+      btn.disabled = false;
+    }, 3000);
+  };
 </script>
