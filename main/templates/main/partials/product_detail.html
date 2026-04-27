@@ -93,8 +93,9 @@
           {% for variant in variants %}
           <button class="color-dot w-6 h-6 {% if variant == selected_variant %}active{% endif %}"
             style="background-color: {{ variant.color.hex_code }};" title="{{ variant.color.name }}"
+            data-variant-id="{{ variant.id }}"
             hx-get="/product/{{ object.slug }}?color={{ variant.color.name }}" hx-target="#gallery-content"
-            hx-trigger="click" onclick="setColorName('{{ variant.color.name }}', this)"></button>
+            hx-trigger="click" onclick="setColorName('{{ variant.color.name }}', this); switchVariant('{{ variant.id }}', {{ variant.stock }})"></button>
           {% endfor %}
         </div>
       </div>
@@ -113,22 +114,23 @@
       </div>
 
       <!-- Add to cart -->
-      <div class="flex gap-3 mb-8">
+      <div class="flex gap-2 sm:gap-3 mb-8 w-full max-w-sm lg:max-w-none">
         {% if selected_variant and selected_variant.stock > 0 %}
-        <form hx-post="{% url 'cart:cart_add' selected_variant.id %}"
+        <form id="add-to-cart-form"
+              hx-post="{% url 'cart:cart_add' selected_variant.id %}"
               hx-target="#cart-icon"
               hx-swap="outerHTML"
               class="flex-1 flex gap-3"
               onsubmit="window.handleAddToCart(this, event);">
           {% csrf_token %}
           
-          <div class="flex items-stretch border border-warm-light hover:border-warm-dark transition-colors duration-200 w-32">
+          <div class="flex items-stretch border border-warm-light hover:border-warm-dark transition-colors duration-200 w-24 sm:w-32">
              <button type="button" class="flex-1 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="window.updateQuantity(-1)">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                    <path d="M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
              </button>
-             <input type="number" name="quantity" id="quantity-input" value="1" min="1" max="{{ selected_variant.stock }}" class="w-10 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;">
+             <input type="number" name="quantity" id="quantity-input" value="1" min="1" max="{{ selected_variant.stock }}" class="w-8 sm:w-10 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;">
              <button type="button" class="flex-1 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="window.updateQuantity(1)">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                    <path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -137,28 +139,21 @@
           </div>
 
           <button type="submit"
-            class="flex-1 bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300 transition-all">
+            class="flex-1 bg-warm-dark text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3 sm:py-4 hover:bg-accent transition-colors duration-300 transition-all">
             Добавить в корзину
           </button>
         </form>
         {% elif selected_variant %}
         <button disabled
-          class="flex-1 bg-warm-light/50 text-cream text-xs tracking-widest uppercase font-body py-4 cursor-not-allowed">
+          class="flex-1 bg-warm-light/50 text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3 sm:py-4 cursor-not-allowed">
           Нет в наличии
         </button>
         {% else %}
         <button disabled
-          class="flex-1 bg-warm-light text-cream text-xs tracking-widest uppercase font-body py-4 cursor-not-allowed">
+          class="flex-1 bg-warm-light text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3 sm:py-4 cursor-not-allowed">
           Выберите цвет
         </button>
         {% endif %}
-        <button
-          class="w-12 border border-warm-light hover:border-warm-dark flex items-center justify-center transition-colors duration-200 group">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 14s-6-4.3-6-8a4 4 0 0 1 6-3.4A4 4 0 0 1 14 6c0 3.7-6 8-6 8z" stroke="#C4B5A5" stroke-width="1.3"
-              class="group-hover:stroke-warm-dark transition-colors" />
-          </svg>
-        </button>
       </div>
 
       <!-- Description -->
@@ -265,6 +260,22 @@
     btn.classList.add('active');
   }
 
+  window.switchVariant = function(variantId, stock) {
+    const form = document.getElementById('add-to-cart-form');
+    if (!form) return;
+    
+    // Обновляем action формы
+    form.setAttribute('hx-post', `/cart/add/${variantId}/`);
+    // Обновляем max количества
+    const input = document.getElementById('quantity-input');
+    if (input) {
+      input.setAttribute('max', stock);
+      if (parseInt(input.value) > stock) input.value = stock;
+    }
+    // Переинициализируем HTMX на форме
+    htmx.process(form);
+  };
+
   function toggleAccordion(btn) {
     const content = btn.nextElementSibling;
     const icon = btn.querySelector('.accordion-icon');
@@ -312,7 +323,7 @@
     
     // Set success state
     btn.innerHTML = 'Добавлено ✓';
-    btn.className = "flex-1 bg-green-700 text-cream text-xs tracking-widest uppercase font-body py-4 transition-all duration-500 cursor-not-allowed";
+    btn.className = "flex-1 bg-green-700 text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3 sm:py-4 transition-all duration-500 cursor-not-allowed";
     
     // Disable slightly after to allow HTMX to process the submit event properly
     setTimeout(() => { btn.disabled = true; }, 10);

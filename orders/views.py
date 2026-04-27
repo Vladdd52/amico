@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
@@ -7,11 +8,16 @@ from urllib.parse import quote
 def checkout(request):
     cart = Cart(request)
     if len(cart) == 0:
+        if request.headers.get('HX-Request'):
+            response = HttpResponse()
+            response['HX-Redirect'] = '/cart/'
+            return response
         return redirect('cart:cart_detail')
         
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
+            platform = request.POST.get('platform', 'telegram')
             order = form.save(commit=False)
             order.total_cost = cart.get_total_price()
             order.save()
@@ -42,9 +48,23 @@ def checkout(request):
             text += f"\n💰 Итого к оплате: {order.total_cost} сум"
             
             encoded_text = quote(text)
-            telegram_url = f"https://t.me/{telegram_username}?text={encoded_text}"
             
-            # Редирект в телеграм
+            if request.headers.get('HX-Request'):
+                if platform == 'instagram':
+                    instagram_username = "amico.uz"
+                    return render(request, 'orders/partials/instagram_modal.html', {
+                        'order': order,
+                        'text': text,
+                        'redirect_url': f"https://ig.me/m/{instagram_username}"
+                    })
+                else:
+                    telegram_url = f"https://t.me/{telegram_username}?text={encoded_text}"
+                    response = HttpResponse()
+                    response['HX-Redirect'] = telegram_url
+                    return response
+
+            # Fallback for non-HTMX
+            telegram_url = f"https://t.me/{telegram_username}?text={encoded_text}"
             return redirect(telegram_url)
     else:
         form = OrderCreateForm()

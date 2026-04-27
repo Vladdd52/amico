@@ -2,19 +2,19 @@
 {% load humanize %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-6 py-12 min-h-[60vh] reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out">
-  <h1 class="font-display text-4xl mb-8 font-light">Оформление заказа</h1>
+<div class="max-w-5xl mx-auto px-6 py-6 sm:py-12 min-h-[60vh] reveal-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out">
+  <h1 class="font-display text-2xl sm:text-3xl lg:text-4xl mb-4 sm:mb-8 font-light">Оформление заказа</h1>
   
   <div class="flex flex-col lg:flex-row gap-12">
     <!-- Form -->
     <div class="flex-1">
       <div class="bg-white p-8 border border-warm-light/30">
-        <h2 class="font-display text-2xl mb-6">Ваши данные</h2>
-        <form method="post" action="{% url 'orders:checkout' %}">
+        <h2 class="font-display text-xl sm:text-2xl mb-6">Ваши данные</h2>
+        <form hx-post="{% url 'orders:checkout' %}" hx-target="#checkout-modal-container" hx-swap="innerHTML">
           {% csrf_token %}
           
           <div class="mb-6">
-            <label class="block text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Имя</label>
+            <label class="block text-[10px] sm:text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Имя</label>
             {{ form.name }}
             {% if form.name.errors %}
               <p class="text-red-500 text-xs mt-1">{{ form.name.errors.0 }}</p>
@@ -22,16 +22,23 @@
           </div>
           
           <div class="mb-10">
-            <label class="block text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Телефон</label>
+            <label class="block text-[10px] sm:text-xs tracking-widest uppercase text-warm-mid font-body mb-1">Телефон</label>
             {{ form.phone }}
             {% if form.phone.errors %}
               <p class="text-red-500 text-xs mt-1">{{ form.phone.errors.0 }}</p>
             {% endif %}
           </div>
           
-          <button type="submit" class="w-full bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300">
-            Оформить в Telegram
-          </button>
+          <div class="flex flex-col gap-3">
+            <button type="submit" name="platform" value="telegram" class="w-full bg-warm-dark text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3.5 sm:py-4 hover:bg-accent transition-colors duration-300 flex items-center justify-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              Оформить в Telegram
+            </button>
+            <button type="submit" name="platform" value="instagram" class="w-full border border-warm-dark text-warm-dark text-[10px] sm:text-xs tracking-widest uppercase font-body py-3.5 sm:py-4 hover:bg-warm-dark hover:text-cream transition-all duration-300 flex items-center justify-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+              Оформить в Instagram
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -39,11 +46,11 @@
     <!-- Summary -->
     <div class="lg:w-80 flex-shrink-0">
       <div class="bg-[#EDE8E2] p-8 border border-warm-light/30 sticky top-24">
-        <h2 class="font-display text-2xl mb-6">Ваш заказ</h2>
+        <h2 class="font-display text-xl sm:text-2xl mb-6">Ваш заказ</h2>
         
         <div class="space-y-4 mb-6 border-b border-warm-light/30 pb-6">
           {% for item in cart %}
-          <div class="flex justify-between text-sm">
+          <div class="flex justify-between text-[13px] sm:text-sm">
             <span class="text-warm-mid font-body pr-4">{{ item.variant.product.name }} ({{ item.variant.color.name }}) x{{ item.quantity }}</span>
             <span class="font-medium font-body whitespace-nowrap">{{ item.total_price|floatformat:0|intcomma }}</span>
           </div>
@@ -52,12 +59,14 @@
         
         <div class="flex justify-between items-center">
           <span class="font-body text-warm-dark font-medium uppercase tracking-widest text-xs">Итого:</span>
-          <span class="font-body text-xl font-medium text-warm-dark">{{ cart.get_total_price|floatformat:0|intcomma }} сум</span>
+          <span class="font-body text-lg sm:text-xl font-medium text-warm-dark">{{ cart.get_total_price|floatformat:0|intcomma }} сум</span>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<div id="checkout-modal-container"></div>
 
 <style>
   /* Base styles for Django form fields injected with class 'form-control' */

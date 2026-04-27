@@ -206,7 +206,7 @@
           hx-target="#main-content"
           hx-push-url="true"
           hx-swap="innerHTML show:window:top"
-          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark transition-colors duration-200 font-body"
+          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-transparent hover:border-warm-dark pb-0.5 transition-all duration-200 font-body"
         >Все</a>
         <a
           href="/sale/"
@@ -214,7 +214,7 @@
           hx-target="#main-content"
           hx-push-url="true"
           hx-swap="innerHTML show:window:top"
-          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-warm-mid/40 hover:border-warm-dark pb-0.5 transition-colors duration-200 font-body"
+          class="text-xs tracking-widest uppercase text-warm-mid hover:text-red-700 border-b border-transparent hover:border-red-700 pb-0.5 transition-all duration-200 font-body"
         >Скидки</a>
         {% for category in categories %}
         <a
@@ -223,7 +223,7 @@
           hx-target="#main-content"
           hx-push-url="true"
           hx-swap="innerHTML show:window:top"
-          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark transition-colors duration-200 font-body"
+          class="text-xs tracking-widest uppercase text-warm-mid hover:text-warm-dark border-b border-transparent hover:border-warm-dark pb-0.5 transition-all duration-200 font-body"
         >{{ category.name }}</a>
         {% endfor %}
       </div>
@@ -242,7 +242,7 @@
       <!-- Brand & Copyright -->
       <div class="flex flex-col items-center md:items-start gap-2">
         <span class="font-display text-2xl text-warm-dark">Amico</span>
-        <p class="text-xs text-warm-light font-body tracking-wider">© 2025 Amico. Все права защищены.</p>
+        <p class="text-xs text-warm-light font-body tracking-wider">© 2026 Amico. Все права защищены.</p>
       </div>
 
       <!-- Contacts -->
@@ -268,7 +268,7 @@
       </button>
       <span class="font-display text-3xl font-light mb-8">Amico</span>
       <a href="/catalog/" hx-get="/catalog/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">Все товары</a>
-      <a href="/sale/" hx-get="/sale/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors"><span class="border-b border-warm-mid/40 pb-0.5">Скидки</span></a>
+      <a href="/sale/" hx-get="/sale/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-red-700 py-3 border-b border-warm-light/30 font-body transition-colors">Скидки</a>
       {% for category in categories %}
       <a href="/catalog/{{ category.slug }}/" hx-get="/catalog/{{ category.slug }}/" hx-target="#main-content" hx-push-url="true" hx-swap="innerHTML show:window:top" onclick="toggleMenu()" class="text-sm tracking-widest uppercase text-warm-mid hover:text-warm-dark py-3 border-b border-warm-light/30 font-body transition-colors">{{ category.name }}</a>
       {% endfor %}
@@ -329,17 +329,54 @@
       elements.forEach(el => observer.observe(el));
     };
 
+    // ── Active Nav Link ──
+    window.updateActiveNavLink = function() {
+      const path = window.location.pathname;
+      // Desktop nav
+      document.querySelectorAll('header nav div.flex a').forEach(a => {
+        const href = a.getAttribute('href');
+        const isActive = (href === path);
+        
+        a.classList.remove('border-warm-dark', 'text-warm-dark', 'border-red-700', 'text-red-700');
+        a.classList.add('border-transparent', 'text-warm-mid');
+        
+        if (isActive) {
+          a.classList.remove('border-transparent', 'text-warm-mid');
+          if (href === '/sale/') {
+            a.classList.add('border-red-700', 'text-red-700');
+          } else {
+            a.classList.add('border-warm-dark', 'text-warm-dark');
+          }
+        }
+      });
+      // Mobile menu
+      document.querySelectorAll('#mobile-menu a').forEach(a => {
+        const href = a.getAttribute('href');
+        const isActive = (href === path);
+        if (isActive) {
+          if (href === '/sale/') a.classList.add('text-red-700');
+          else a.classList.add('text-warm-dark');
+          a.classList.remove('text-warm-mid');
+        } else {
+          a.classList.remove('text-warm-dark', 'text-red-700');
+          a.classList.add('text-warm-mid');
+        }
+      });
+    };
+
     // HTMX: after content swap
     document.body.addEventListener('htmx:afterSwap', function(e) {
       if (typeof initCarousel === 'function') initCarousel();
       
       // Re-init scroll reveal for new content
       setTimeout(window.initScrollReveal, 100);
+      window.updateActiveNavLink();
     });
 
     // Initial page load
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(window.initScrollReveal, 100);
+      window.updateActiveNavLink();
     });
 
     // Global card slide function

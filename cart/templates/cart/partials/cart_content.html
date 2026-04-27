@@ -20,20 +20,24 @@
       <div class="flex-1 flex flex-col justify-between">
         <div>
           <a href="/product/{{ item.variant.product.slug }}" class="hover:text-accent transition-colors">
-            <h3 class="font-display text-xl lg:text-2xl mb-1">{{ item.variant.product.name }}</h3>
+            <h3 class="font-display text-base sm:text-lg lg:text-xl mb-0.5">{{ item.variant.product.name }}</h3>
           </a>
-          <p class="text-xs text-warm-mid font-body tracking-wider uppercase mb-2">Цвет: {{ item.variant.color.name }}</p>
-          <p class="font-body text-sm font-medium">{{ item.price|floatformat:0|intcomma }} сум</p>
+          <p class="text-[10px] sm:text-xs text-warm-mid font-body tracking-wider uppercase mb-1">Цвет: {{ item.variant.color.name }}</p>
+          <p class="text-[10px] sm:text-xs text-green-700/80 font-body tracking-wider mb-2 flex items-center gap-1">
+            <span class="w-1 h-1 rounded-full bg-green-700/60"></span>
+            В наличии: {{ item.variant.stock }} шт.
+          </p>
+          <p class="font-body text-xs sm:text-sm font-medium">{{ item.price|floatformat:0|intcomma }} сум</p>
         </div>
         
         <div class="flex justify-between items-end mt-4">
           <form hx-post="{% url 'cart:cart_update' item.variant.id %}" hx-target="#cart-content" hx-swap="innerHTML" class="flex items-center border border-warm-light/40 hover:border-warm-dark transition-colors duration-200">
             {% csrf_token %}
-            <button type="submit" class="w-8 h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.nextElementSibling; inp.value=Math.max(1, parseInt(inp.value)-1);">
+            <button type="submit" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.nextElementSibling; inp.value=Math.max(1, parseInt(inp.value)-1);">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.stock }}" class="w-8 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body text-xs p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;" onchange="this.form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
-            <button type="submit" class="w-8 h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.previousElementSibling; const max=parseInt(inp.getAttribute('max'))||999; inp.value=Math.min(max, parseInt(inp.value)+1);">
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.stock }}" class="w-7 sm:w-8 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body text-[11px] sm:text-xs p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;" onchange="this.form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+            <button type="submit" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.previousElementSibling; const max=parseInt(inp.getAttribute('max'))||999; inp.value=Math.min(max, parseInt(inp.value)+1);">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
           </form>
@@ -54,15 +58,15 @@
   
   <!-- Summary & Checkout -->
   <div class="lg:w-80 flex-shrink-0">
-    <div class="bg-white p-8 sticky top-24 border border-warm-light/30">
-      <h2 class="font-display text-2xl font-light mb-6">Ваш заказ</h2>
+    <div class="bg-white p-6 sm:p-8 sticky top-24 border border-warm-light/30">
+      <h2 class="font-display text-xl sm:text-2xl font-light mb-4 sm:mb-6">Ваш заказ</h2>
       
       <div class="flex justify-between items-center mb-6 border-b border-warm-light/30 pb-6">
-        <span class="font-body text-warm-mid">Итого:</span>
-        <span class="font-body text-xl font-medium">{{ cart.get_total_price|floatformat:0|intcomma }} сум</span>
+        <span class="font-body text-warm-mid text-sm sm:text-base">Итого к оплате:</span>
+        <span class="font-body text-base sm:text-lg lg:text-xl font-medium">{{ cart.get_total_price|floatformat:0|intcomma }} сум</span>
       </div>
       
-      <a href="{% url 'orders:checkout' %}" class="block text-center w-full bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 hover:bg-accent transition-colors duration-300">
+      <a href="{% url 'orders:checkout' %}" class="block text-center w-full bg-warm-dark text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3.5 sm:py-4 hover:bg-accent transition-colors duration-300">
         Оформить заказ
       </a>
     </div>
@@ -78,8 +82,8 @@
 
 {% else %}
 <div class="text-center py-20 bg-white border border-warm-light/30">
-  <p class="font-display text-2xl text-warm-mid mb-6">Ваша корзина пуста</p>
-  <a href="{% url 'main:catalog_all' %}" class="inline-block bg-warm-dark text-cream text-xs tracking-widest uppercase font-body py-4 px-10 hover:bg-accent transition-colors duration-300">
+  <p class="font-display text-xl sm:text-2xl text-warm-mid mb-6">Ваша корзина пуста</p>
+  <a href="{% url 'main:catalog_all' %}" class="inline-block bg-warm-dark text-cream text-[10px] sm:text-xs tracking-widest uppercase font-body py-3.5 px-8 sm:py-4 sm:px-10 hover:bg-accent transition-colors duration-300">
     Вернуться к покупкам
   </a>
 </div>

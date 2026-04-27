@@ -4,13 +4,13 @@
      onclick="closeFilter()"></div>
 
 <aside id="filter-sidebar"
-       class="fixed top-0 right-0 bottom-0 z-50 w-80 bg-cream shadow-2xl overflow-y-auto"
+       class="fixed top-0 right-0 bottom-0 z-50 w-[260px] sm:w-80 bg-cream shadow-2xl overflow-y-auto"
        style="transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);">
 
-  <div class="p-8">
+  <div class="p-5 sm:p-8">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
-      <h2 class="font-display text-xl sm:text-2xl font-light">Фильтры</h2>
+      <h2 class="font-display text-lg sm:text-xl font-light">Фильтры</h2>
       <button onclick="closeFilter()" class="text-warm-mid hover:text-warm-dark transition-colors">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -22,7 +22,7 @@
 
       <!-- ── SORT ── -->
       <div class="mb-8">
-        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-4">Сортировка</h3>
+        <h3 class="text-[10px] sm:text-xs tracking-widest uppercase text-warm-mid font-body mb-3 sm:mb-4">Сортировка</h3>
         <div class="space-y-1">
           {% for label, value in sort_options %}
           <label class="flex items-center gap-3 cursor-pointer group py-1.5">
@@ -31,7 +31,7 @@
                    class="hidden peer sort-radio"
                    onchange="applyFilters()" />
             <span class="sort-radio-ui w-4 h-4 rounded-full border border-warm-light/60 flex items-center justify-center flex-shrink-0 transition-all duration-200 peer-checked:border-warm-dark after:content-[''] after:w-2 after:h-2 after:bg-warm-dark after:rounded-full after:scale-0 peer-checked:after:scale-100 after:transition-transform after:duration-200"></span>
-            <span class="text-sm font-body text-warm-mid group-hover:text-warm-dark transition-colors">{{ label }}</span>
+            <span class="text-[13px] sm:text-sm font-body text-warm-mid group-hover:text-warm-dark transition-colors">{{ label }}</span>
           </label>
           {% endfor %}
         </div>
@@ -41,7 +41,7 @@
 
       <!-- ── COLOR ── -->
       <div class="mb-8">
-        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-4">Цвет</h3>
+        <h3 class="text-[10px] sm:text-xs tracking-widest uppercase text-warm-mid font-body mb-3 sm:mb-4">Цвет</h3>
         <div class="flex flex-wrap gap-3">
           {% for color in colors %}
           <button
@@ -51,10 +51,10 @@
             onclick="toggleColorFilter('{{ color.name }}', this)"
           >
             <span
-              class="filter-color-swatch w-7 h-7 rounded-full block transition-all duration-150"
+              class="filter-color-swatch w-6 h-6 sm:w-7 sm:h-7 rounded-full block transition-all duration-150"
               style="background-color: {{ color.hex_code }}; box-shadow: 0 0 0 2px transparent;"
             ></span>
-            <span class="text-xs text-warm-light font-body group-hover:text-warm-dark transition-colors leading-none">{{ color.name }}</span>
+            <span class="text-[10px] sm:text-xs text-warm-light font-body group-hover:text-warm-dark transition-colors leading-none">{{ color.name }}</span>
           </button>
           {% endfor %}
         </div>
@@ -65,24 +65,24 @@
 
       <!-- ── PRICE ── -->
       <div class="mb-8">
-        <h3 class="text-xs tracking-widest uppercase text-warm-mid font-body mb-5">Цена</h3>
+        <h3 class="text-[10px] sm:text-xs tracking-widest uppercase text-warm-mid font-body mb-4 sm:mb-5">Цена</h3>
 
         <!-- Price inputs -->
         <div class="flex gap-3 mb-4">
           <div class="flex-1">
-            <label class="text-xs text-warm-light font-body block mb-1">От</label>
+            <label class="text-[10px] sm:text-xs text-warm-light font-body block mb-1">От</label>
             <input type="number" name="min_price" id="min_price_input"
                    value="{{ current_min_price|default:'' }}"
                    placeholder="0"
-                   class="w-full bg-transparent border-b border-warm-light/50 text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
+                   class="w-full bg-transparent border-b border-warm-light/50 text-xs sm:text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
                    oninput="syncSlider('min'); applyFilters()" />
           </div>
           <div class="flex-1">
-            <label class="text-xs text-warm-light font-body block mb-1">До</label>
+            <label class="text-[10px] sm:text-xs text-warm-light font-body block mb-1">До</label>
             <input type="number" name="max_price" id="max_price_input"
                    value="{{ current_max_price|default:'' }}"
                    placeholder="100000"
-                   class="w-full bg-transparent border-b border-warm-light/50 text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
+                   class="w-full bg-transparent border-b border-warm-light/50 text-xs sm:text-sm text-warm-dark font-body py-1 outline-none focus:border-warm-dark transition-colors placeholder-warm-light/50"
                    oninput="syncSlider('max'); applyFilters()" />
           </div>
         </div>
@@ -106,7 +106,7 @@
 
       <!-- Reset -->
       <button type="button" onclick="resetFilters()"
-              class="w-full border border-warm-light text-warm-mid text-xs tracking-widest uppercase font-body py-3 hover:border-warm-dark hover:text-warm-dark transition-colors duration-200">
+              class="w-full border border-warm-light text-warm-mid text-[10px] sm:text-xs tracking-widest uppercase font-body py-2.5 sm:py-3 hover:border-warm-dark hover:text-warm-dark transition-colors duration-200">
         Сбросить всё
       </button>
 
