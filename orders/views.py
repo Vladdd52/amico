@@ -31,11 +31,9 @@ def checkout(request):
                     quantity=item['quantity']
                 )
                 
-            # Очищаем корзину
             cart.clear()
             
-            # Формируем сообщение для Telegram
-            telegram_username = "aminaaamiiir" # ЗАМЕНИТЕ НА ВАШ ЮЗЕРНЕЙМ В ТЕЛЕГРАМЕ
+            telegram_username = "aminaaamiiir"
             
             text = f"📦 Новый заказ №{order.id}\n\n"
             text += f"👤 Имя: {order.name}\n"
@@ -63,9 +61,15 @@ def checkout(request):
                     response['HX-Redirect'] = telegram_url
                     return response
 
-            # Fallback for non-HTMX
             telegram_url = f"https://t.me/{telegram_username}?text={encoded_text}"
             return redirect(telegram_url)
+        else:
+            # Форма невалидна
+            if request.headers.get('HX-Request'):
+                return render(request, 'orders/partials/checkout_form.html', {
+                    'form': form,
+                    'cart': cart
+                })
     else:
         form = OrderCreateForm()
         
