@@ -1,5 +1,5 @@
 {% load humanize %}
-<article class="product-card group relative" data-product-id="{{ product.id }}">
+<article class="product-card group relative w-full max-w-[400px] sm:max-w-none mx-auto" data-product-id="{{ product.id }}">
 
   <!-- Image wrapper — square, no gaps -->
   <div class="relative bg-[#EDE8E2] aspect-square overflow-hidden">
@@ -87,7 +87,7 @@
       hx-push-url="true"
       hx-swap="innerHTML show:window:top"
     >
-      <h3 class="font-body text-sm text-warm-dark hover:text-accent transition-colors duration-200 leading-snug mb-2">
+      <h3 class="font-body text-lg sm:text-sm text-warm-dark hover:text-accent transition-colors duration-200 leading-snug mb-2">
         {{ product.name }}
       </h3>
     </a>
@@ -95,15 +95,17 @@
     <!-- Color swatches -->
     {% with variants=product.product_variants.all %}
     {% if variants %}
-    <div class="flex items-center justify-center gap-2 mb-2">
+    <div class="flex items-center justify-center gap-0 -mt-1 mb-1">
       {% for variant in variants %}
-      <button
-        class="card-color-dot w-4 h-4 rounded-full transition-all duration-200"
-        style="background-color: {{ variant.color.hex_code }}; box-shadow: {% if current_color and variant.color.name|lower == current_color|lower %}0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814{% elif forloop.first and not current_color %}0 0 0 2px #F5F0EB, 0 0 0 3.5px #1C1814{% else %}0 0 0 2px transparent{% endif %};"
+      <div
+        role="button"
+        tabindex="0"
+        class="card-color-dot w-5 h-5 sm:w-4 sm:h-4 rounded-full m-1 transition-all duration-200 cursor-pointer !overflow-visible"
+        style="background-color: {{ variant.color.hex_code }}; box-shadow: {% if current_color and variant.color.name|lower == current_color|lower %}0 0 0 2px #F5F0EB, 0 0 0 4px #1C1814{% elif forloop.first and not current_color %}0 0 0 2px #F5F0EB, 0 0 0 4px #1C1814{% else %}0 0 0 2px transparent{% endif %};"
         title="{{ variant.color.name }}"
         data-product="{{ product.id }}"
         onclick="cardSwitchColor('{{ product.id }}', '{{ variant.color.name|lower }}', this)"
-      ></button>
+      ></div>
       {% endfor %}
     </div>
     {% endif %}
@@ -111,11 +113,11 @@
 
     {% if product.discount_price %}
     <div class="mb-3">
-      <p class="font-body text-[10px] sm:text-xs font-medium text-warm-dark/50 line-through mb-0.5">{{ product.price|floatformat:0|intcomma }} сум</p>
-      <p class="font-body text-xs sm:text-sm font-medium text-red-700">{{ product.discount_price|floatformat:0|intcomma }} сум</p>
+      <p class="font-body text-base sm:text-[10px] md:text-xs font-medium text-warm-dark/50 line-through mb-0.5">{{ product.price|floatformat:0|intcomma }} сум</p>
+      <p class="font-body text-xl sm:text-xs md:text-sm font-medium text-red-700">{{ product.discount_price|floatformat:0|intcomma }} сум</p>
     </div>
     {% else %}
-    <p class="font-body text-xs sm:text-sm font-medium text-warm-dark mb-3">{{ product.price|floatformat:0|intcomma }} сум</p>
+    <p class="font-body text-xl sm:text-xs md:text-sm font-medium text-warm-dark mb-3">{{ product.price|floatformat:0|intcomma }} сум</p>
     {% endif %}
 
     <a
@@ -124,7 +126,7 @@
       hx-target="#main-content"
       hx-push-url="true"
       hx-swap="innerHTML show:window:top"
-      class="block w-full bg-white border border-warm-light/60 text-warm-dark text-[10px] sm:text-xs tracking-widest uppercase font-body py-2 sm:py-2.5 hover:bg-warm-dark hover:text-cream hover:border-warm-dark transition-all duration-250"
+      class="block w-full bg-white border border-warm-light/60 text-warm-dark text-sm sm:text-[10px] md:text-xs tracking-widest uppercase font-body py-3 sm:py-2 md:py-2.5 hover:bg-warm-dark hover:text-cream hover:border-warm-dark transition-all duration-250"
     >
       Подробнее
     </a>

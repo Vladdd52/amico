@@ -73,15 +73,16 @@
 
     /* Color dot */
     .color-dot {
-      width: 16px;
-      height: 16px;
       border-radius: 50%;
-      border: 1.5px solid transparent;
       cursor: pointer;
       transition: all 0.2s;
+      margin: 4px;
+      overflow: visible !important;
     }
-    .color-dot.active, .color-dot:hover {
-      border-color: #1C1814;
+    .color-dot.active {
+      box-shadow: 0 0 0 2px #F5F0EB, 0 0 0 4px #1C1814;
+    }
+    .color-dot:hover {
       transform: scale(1.15);
     }
 
