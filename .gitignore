@@ -1,13 +1,38 @@
-venv/
-.pylintrc
+# Byte-compiled / optimized / DLL files
 __pycache__/
+*.py[cod]
+*$py.class
 
-.vscode
-.idea
+# Environments
 .env
-django.log
-security.log
+.venv
+env/
+venv/
+ENV/
 
+# Django stuff:
+*.log
+local_settings.py
 db.sqlite3
+db.sqlite3-journal
 media/
-debug.log
+static_root/
+staticfiles/
+/static/
+
+# Logs
+logs/
+*.log
+
+# OS stuff
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+requirements.txt.bak

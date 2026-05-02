@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
+from django_ratelimit.decorators import ratelimit
 from main.models import ProductColor
 from .cart import Cart
 
 @require_POST
+@ratelimit(key='ip', rate='10/m', block=True)
 def cart_add(request, variant_id):
     cart = Cart(request)
     product_variant = get_object_or_404(ProductColor, id=variant_id)
@@ -21,6 +23,8 @@ def cart_add(request, variant_id):
         
     return redirect('cart:cart_detail')
 
+@require_POST
+@ratelimit(key='ip', rate='10/m', block=True)
 def cart_remove(request, variant_id):
     cart = Cart(request)
     product_variant = get_object_or_404(ProductColor, id=variant_id)
@@ -37,6 +41,7 @@ def cart_detail(request):
     return render(request, 'cart/cart_detail.html', {'cart': cart})
 
 @require_POST
+@ratelimit(key='ip', rate='10/m', block=True)
 def cart_update(request, variant_id):
     cart = Cart(request)
     product_variant = get_object_or_404(ProductColor, id=variant_id)

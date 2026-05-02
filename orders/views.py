@@ -4,7 +4,9 @@ from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
 from urllib.parse import quote
+from django_ratelimit.decorators import ratelimit
 
+@ratelimit(key='ip', rate='10/m', method='POST', block=True)
 def checkout(request):
     cart = Cart(request)
     if len(cart) == 0:

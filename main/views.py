@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, DetailView, View
 from django.template.response import TemplateResponse
 from django.db.models import Q, Prefetch, Min

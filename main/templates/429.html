@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Слишком много запросов — Amico{% endblock %}
+
+{% block content %}
+<section class="min-h-[70vh] flex items-center justify-center px-4 py-20">
+    <div class="max-w-md w-full text-center reveal-on-scroll">
+        <div class="mb-8 relative">
+            <span class="text-[120px] font-display font-light text-warm-light/20 leading-none">429</span>
+        </div>
+        
+        <h1 class="font-display text-3xl text-warm-dark mb-4 font-light">Нужно немного подождать</h1>
+        <p class="font-body text-warm-mid mb-10 leading-relaxed">
+            Вы отправляете запросы слишком часто. Пожалуйста, сделайте небольшую паузу и попробуйте снова через минуту. 
+        </p>
+    </div>
+</section>
+{% endblock %}
