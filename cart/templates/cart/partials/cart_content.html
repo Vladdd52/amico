@@ -4,8 +4,8 @@
   <!-- Items -->
   <div class="flex-1">
     {% for item in cart %}
-    <div class="flex gap-6 py-6 border-b border-warm-light/30">
-      <div class="w-24 h-32 lg:w-32 lg:h-44 bg-[#EDE8E2] flex-shrink-0 relative overflow-hidden">
+    <div class="flex gap-4 sm:gap-6 py-6 border-b border-warm-light/30">
+      <div class="w-28 h-40 sm:w-32 sm:h-44 lg:w-36 lg:h-48 bg-[#EDE8E2] flex-shrink-0 relative overflow-hidden">
         <a href="/product/{{ item.variant.product.slug }}" class="absolute inset-0">
           {% with image=item.variant.images.first %}
           {% if image %}
@@ -20,24 +20,24 @@
       <div class="flex-1 flex flex-col justify-between">
         <div>
           <a href="/product/{{ item.variant.product.slug }}" class="hover:text-accent transition-colors">
-            <h3 class="font-display text-base sm:text-lg lg:text-xl mb-0.5">{{ item.variant.product.name }}</h3>
+            <h3 class="font-display text-lg lg:text-xl mb-0.5">{{ item.variant.product.name }}</h3>
           </a>
-          <p class="text-[10px] sm:text-xs text-warm-mid font-body tracking-wider uppercase mb-1">Цвет: {{ item.variant.color.name }}</p>
-          <p class="text-[10px] sm:text-xs text-green-700/80 font-body tracking-wider mb-2 flex items-center gap-1">
+          <p class="text-xs text-warm-mid font-body tracking-wider uppercase mb-1">Цвет: {{ item.variant.color.name }}</p>
+          <p class="text-xs text-green-700/80 font-body tracking-wider mb-2 flex items-center gap-1">
             <span class="w-1 h-1 rounded-full bg-green-700/60"></span>
             В наличии: {{ item.variant.stock }} шт.
           </p>
-          <p class="font-body text-xs sm:text-sm font-medium">{{ item.price|floatformat:0|intcomma }} сум</p>
+          <p class="font-body text-base font-medium">{{ item.price|floatformat:0|intcomma }} сум</p>
         </div>
         
         <div class="flex justify-between items-end mt-4">
           <form hx-post="{% url 'cart:cart_update' item.variant.id %}" hx-target="#cart-content" hx-swap="innerHTML" class="flex items-center border border-warm-light/40 hover:border-warm-dark transition-colors duration-200">
             {% csrf_token %}
-            <button type="submit" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.nextElementSibling; inp.value=Math.max(1, parseInt(inp.value)-1);">
+            <button type="submit" class="w-8 h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.nextElementSibling; inp.value=Math.max(1, parseInt(inp.value)-1);">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.stock }}" class="w-7 sm:w-8 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body text-[11px] sm:text-xs p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;" onchange="this.form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
-            <button type="submit" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.previousElementSibling; const max=parseInt(inp.getAttribute('max'))||999; inp.value=Math.min(max, parseInt(inp.value)+1);">
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.variant.stock }}" class="w-8 text-center bg-transparent border-none focus:ring-0 text-warm-dark font-body text-xs p-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none appearance-none m-0" style="-moz-appearance: textfield;" onchange="this.form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
+            <button type="submit" class="w-8 h-8 flex items-center justify-center text-warm-dark hover:bg-warm-light/20 transition-colors" onclick="const inp=this.previousElementSibling; const max=parseInt(inp.getAttribute('max'))||999; inp.value=Math.min(max, parseInt(inp.value)+1);">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
           </form>
@@ -47,7 +47,7 @@
               <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              <span>Удалить</span>
+              <span class="hidden sm:inline">Удалить</span>
             </button>
           </form>
         </div>
